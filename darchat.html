@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARCHAT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        /* CSS Variables for Dark Mode (Default) */
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #e2e8f0;
+            --chat-bg: #1a202c;
+            --header-bg: #1e293b;
+            --border-color: #334155;
+            --bot-message-bg: #334155;
+            --user-message-bg: #6366f1;
+            --input-bg: #1e293b;
+            --input-field-bg: #0f172a;
+            --input-text-color: #e2e8f0;
+            --button-bg: #6366f1;
+            --icon-color: #94a3b8;
+            --settings-bg: #1e293b;
+            --option-hover-bg: #334155;
+            --chat-font-size: 16rem;
+        }
+
+        /* CSS Variables for Light Mode */
+        .light-mode {
+            --bg-color: #f1f5e9;
+            --text-color: #1e293b;
+            --chat-bg: #ffffff;
+            --header-bg: #e2e8f0;
+            --border-color: #cbd5e1;
+            --bot-message-bg: #e2e8f0;
+            --user-message-bg: #3b82f6;
+            --input-bg: #e2e8f0;
+            --input-field-bg: #ffffff;
+            --input-text-color: #1e293b;
+            --button-bg: #3b82f6;
+            --icon-color: #475569;
+            --settings-bg: #ffffff;
+            --option-hover-bg: #f3f4f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Prevent body scroll */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .chat-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-bg);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .chat-header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .chat-header .header-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .chat-header button {
+            background-color: transparent;
+            border: none;
+            color: var(--icon-color);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s, color 0.3s ease;
+        }
+        .chat-header button:hover {
+            background-color: var(--border-color);
+        }
+
+        /* Fade-in animation for messages */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            font-size: var(--chat-font-size);
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            transition: background-color 0.3s ease;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .message.user {
+            align-self: flex-end;
+            background-color: var(--user-message-bg);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .message.bot {
+            align-self: flex-start;
+            background-color: var(--bot-message-bg);
+            color: var(--text-color);
+            border-bottom-left-radius: 4px;
+        }
+        .chat-input {
+            display: flex;
+            padding: 16px;
+            background-color: var(--input-bg);
+            border-top: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            background-color: var(--input-field-bg);
+            border: 1px solid var(--border-color);
+            color: var(--input-text-color);
+            padding: 12px 16px;
+            border-radius: 24px;
+            outline: none;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+        .chat-input button {
+            background-color: var(--button-bg);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            margin-left: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .chat-input button:hover {
+            background-color: #4f46e5;
+        }
+        .light-mode .chat-input button:hover {
+            background-color: #2563eb;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-style: italic;
+            color: var(--icon-color);
+        }
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background-color: var(--icon-color);
+            border-radius: 50%;
+            display: inline-block;
+            animation: typing-pulse 1.2s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes typing-pulse {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Menu Overlay Styles */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .menu-content {
+            background-color: var(--settings-bg);
+            color: var(--text-color);
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .menu-content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .menu-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--icon-color);
+            cursor: pointer;
+            line-height: 1;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+        .menu-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .menu-option {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .menu-option:hover {
+            background-color: var(--option-hover-bg);
+        }
+
+        /* Theme Switch Styles */
+        .theme-switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4b5563;
+            transition: 0.4s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #6366f1;
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .settings-section-title {
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+        }
+
+        .font-size-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .font-size-controls button {
+            background-color: var(--option-hover-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .font-size-controls button:hover {
+            background-color: var(--border-color);
+        }
+
+        .personality-display-button {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        .personality-display-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .light-mode .personality-display-button {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .light-mode .personality-display-button:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900">
+
+    <div class="chat-container">
+        <header class="chat-header">
+            <h1>DARCHAT</h1>
+            <div class="header-buttons">
+                <!-- Personality display and button -->
+                <button id="personality-button" class="personality-display-button" aria-label="Change Personality">
+                    <span id="personality-text">Balanced</span>
+                </button>
+                <!-- Settings button -->
+                <button id="settings-button" aria-label="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.318.802 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.802 3.318-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.318-.802-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.802-3.318 2.37-2.37.525.32.909.897 1.066 1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot">Got any questions? Ask me!</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message..." autofocus>
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <!-- Settings Menu -->
+    <div id="settings-menu" class="menu-overlay hidden">
+        <div class="menu-content">
+            <button id="settings-close-button" class="menu-close-button">&times;</button>
+            <h2>Settings</h2>
+
+            <div class="theme-switch-container">
+                <span>Dark Mode / Light Mode</span>
+                <label class="theme-switch">
+                    <input type="checkbox" id="theme-switch">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="settings-section-title">Chat Options</div>
+            <div class="menu-option" id="clear-chat-option">Clear Chat History</div>
+            
+            <div class="settings-section-title">Font Size</div>
+            <div class="menu-option font-size-controls">
+                <button id="font-size-decrease">-</button>
+                <span>Current Size</span>
+                <button id="font-size-increase">+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personality Menu -->
+    <div id="personality-menu" class="menu-overlay hidden">
+        <div class="menu-content">
+            <button id="personality-close-button" class="menu-close-button">&times;</button>
+            <h2>Select Personality</h2>
+            <div class="menu-options">
+                <div class="menu-option" data-personality="humorous">Humorous</div>
+                <div class="menu-option" data-personality="balanced">Balanced</div>
+                <div class="menu-option" data-personality="straightforward">Straightforward</div>
+                <div class="menu-option" data-personality="not-helpful">Not Helpful At All</div>
+                <div class="menu-option" data-personality="deep-thinker">Deep Thinker</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userMessageInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const chatMessages = document.getElementById('chat-messages');
+        const settingsButton = document.getElementById('settings-button');
+        const settingsMenu = document.getElementById('settings-menu');
+        const settingsCloseButton = document.getElementById('settings-close-button');
+        const themeSwitch = document.getElementById('theme-switch');
+        const clearChatOption = document.getElementById('clear-chat-option');
+        const fontSizeDecrease = document.getElementById('font-size-decrease');
+        const fontSizeIncrease = document.getElementById('font-size-increase');
+
+        const personalityButton = document.getElementById('personality-button');
+        const personalityText = document.getElementById('personality-text');
+        const personalityMenu = document.getElementById('personality-menu');
+        const personalityCloseButton = document.getElementById('personality-close-button');
+        const personalityOptions = document.querySelectorAll('.menu-option');
+
+        const personalityInstructions = {
+            'humorous': "You are a witty, sarcastic, and funny chatbot. Your responses are concise and always contain a joke or playful remark. Do not provide overly serious or long-winded answers.",
+            'balanced': "You are a friendly and helpful assistant. Keep your responses concise and easy to understand.",
+            'straightforward': "You are a chatbot that provides extremely brief, direct, and factual answers. Your responses must be a single sentence. Do not use any conversational fillers or elaborate.",
+            'not-helpful': "You are a chatbot that is intentionally not helpful. Your responses must be vague, uninformative, and sometimes nonsensical. Refuse to provide helpful information or directly answer questions.",
+            'deep-thinker': "You are a profound and insightful chatbot. Your responses should be lengthy, detailed, and explore the topic from multiple angles. Do not use any conversational fillers."
+        };
+
+        const personalityDisplayNames = {
+            'humorous': 'Humorous',
+            'balanced': 'Balanced',
+            'straightforward': 'Straightforward',
+            'not-helpful': 'Not Helpful',
+            'deep-thinker': 'Deep Thinker'
+        };
+
+        let currentPersonality = localStorage.getItem('personality') || 'balanced';
+
+        function updatePersonalityDisplay() {
+            personalityText.innerText = personalityDisplayNames[currentPersonality];
+        }
+
+        // Check for saved theme preference and personality on page load
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+            themeSwitch.checked = true;
+        }
+        updatePersonalityDisplay();
+
+        // Initialize font size from a variable
+        let currentFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chat-font-size')) || 16;
+        document.documentElement.style.setProperty('--chat-font-size', `${currentFontSize}px`);
+
+        function appendMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            
+            // Convert newline characters and URLs to HTML
+            let processedText = text.replace(/\n/g, '<br>');
+            processedText = processedText.replace(/\b(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-400 hover:text-blue-300 underline">$1</a>');
+            
+            messageElement.innerHTML = processedText;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return messageElement;
+        }
+
+        async function sendMessage() {
+            const prompt = userMessageInput.value.trim();
+            if (prompt === '') return;
+
+            appendMessage(prompt, 'user');
+            userMessageInput.value = '';
+
+            // Check if the not-helpful personality should give a sassy response
+            if (currentPersonality === 'not-helpful' && Math.random() < 0.5) {
+                const sassyResponses = ["nah", "i don't feel like it", "find it yourself", "maybe later"];
+                const response = sassyResponses[Math.floor(Math.random() * sassyResponses.length)];
+                appendMessage(response, 'bot');
+                return;
+            }
+
+            const typingIndicator = document.createElement('div');
+            typingIndicator.classList.add('typing-indicator', 'bot');
+            typingIndicator.innerHTML = `<span></span><span></span><span></span>`;
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                tools: [{ "google_search": {} }],
+                systemInstruction: {
+                    parts: [{ text: personalityInstructions[currentPersonality] }]
+                }
+            };
+            console.log("Sending payload to Gemini API:", JSON.stringify(payload, null, 2));
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+
+                chatMessages.removeChild(typingIndicator);
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const botResponse = candidate.content.parts[0].text;
+                    appendMessage(botResponse, 'bot');
+                } else {
+                    appendMessage("I couldn't generate a response. Please try again.", 'bot');
+                }
+
+            } catch (error) {
+                console.error("Failed to fetch from Gemini API:", error);
+                chatMessages.removeChild(typingIndicator);
+                appendMessage("An error occurred while communicating with the AI. Please check the console for details.", 'bot');
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        userMessageInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        settingsButton.addEventListener('click', () => {
+            settingsMenu.classList.remove('hidden');
+        });
+
+        settingsCloseButton.addEventListener('click', () => {
+            settingsMenu.classList.add('hidden');
+        });
+
+        themeSwitch.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        clearChatOption.addEventListener('click', () => {
+            chatMessages.innerHTML = '<div class="message bot">Chat history cleared.</div>';
+            settingsMenu.classList.add('hidden');
+        });
+
+        fontSizeDecrease.addEventListener('click', () => {
+            currentFontSize = Math.max(0.8, currentFontSize - 0.2);
+            document.documentElement.style.setProperty('--chat-font-size', `${currentFontSize}rem`);
+        });
+
+        fontSizeIncrease.addEventListener('click', () => {
+            currentFontSize = Math.min(2.0, currentFontSize + 0.2);
+            document.documentElement.style.setProperty('--chat-font-size', `${currentFontSize}rem`);
+        });
+
+        personalityButton.addEventListener('click', () => {
+            personalityMenu.classList.remove('hidden');
+        });
+
+        personalityCloseButton.addEventListener('click', () => {
+            personalityMenu.classList.add('hidden');
+        });
+
+        personalityOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                const newPersonality = e.target.dataset.personality;
+                currentPersonality = newPersonality;
+                localStorage.setItem('personality', newPersonality);
+                updatePersonalityDisplay();
+                personalityMenu.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
