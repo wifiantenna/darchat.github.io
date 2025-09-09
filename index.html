@@ -24,7 +24,7 @@
             --icon-color: #94a3b8;
             --settings-bg: #1e293b;
             --option-hover-bg: #334155;
-            --chat-font-size: 16rem;
+            --chat-font-size: 16px;
         }
 
         /* CSS Variables for Light Mode */
@@ -57,6 +57,13 @@
             overflow: hidden; /* Prevent body scroll */
             transition: background-color 0.3s ease, color 0.3s ease;
         }
+        
+        .main-content {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+        
         .chat-container {
             width: 100%;
             height: 100vh;
@@ -75,6 +82,8 @@
             background-color: var(--header-bg);
             border-bottom: 1px solid var(--border-color);
             transition: background-color 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            z-index: 50;
         }
         .chat-header h1 {
             font-size: 1.25rem;
@@ -83,6 +92,7 @@
         .chat-header .header-buttons {
             display: flex;
             gap: 0.5rem;
+            align-items: center;
         }
         .chat-header button {
             background-color: transparent;
@@ -96,7 +106,161 @@
         .chat-header button:hover {
             background-color: var(--border-color);
         }
+        .voice-control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .voice-control-button {
+            background-color: var(--button-bg);
+            border: none;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .voice-control-button:hover {
+            background-color: #4f46e5;
+        }
+        .light-mode .voice-control-button {
+            background-color: var(--button-bg);
+        }
+        .light-mode .voice-control-button:hover {
+            background-color: #2563eb;
+        }
 
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100vh;
+            background-color: var(--settings-bg);
+            color: var(--text-color);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        .sidebar-content {
+            flex-grow: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+        .sidebar-close-button {
+            background-color: transparent;
+            border: none;
+            color: var(--icon-color);
+            cursor: pointer;
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .sidebar-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .new-chat-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            margin: 0 1rem 1rem;
+            border-radius: 0.5rem;
+            background-color: var(--button-bg);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .new-chat-btn:hover {
+            background-color: #4f46e5;
+        }
+        .chat-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .chat-list-item:hover {
+            background-color: var(--option-hover-bg);
+        }
+        .chat-list-item.active {
+            background-color: #334155;
+            border-left: 4px solid var(--user-message-bg);
+        }
+        .chat-list-item .chat-title {
+            flex-grow: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .chat-list-item .chat-action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .chat-list-item:hover .chat-action-buttons {
+            opacity: 1;
+        }
+        .chat-list-item .chat-action-buttons button {
+            background: none;
+            border: none;
+            color: var(--icon-color);
+            cursor: pointer;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+        .chat-title-input {
+            background-color: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-color);
+            font-size: inherit;
+            flex-grow: 1;
+            padding: 0;
+            margin: 0;
+        }
+        
         /* Fade-in animation for messages */
         @keyframes fadeIn {
             from {
@@ -138,13 +302,27 @@
             color: var(--text-color);
             border-bottom-left-radius: 4px;
         }
+        
         .chat-input {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             display: flex;
+            flex-direction: column;
             padding: 16px;
             background-color: var(--input-bg);
             border-top: 1px solid var(--border-color);
             transition: background-color 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 50;
         }
+
+        .chat-input .input-row {
+            display: flex;
+            width: 100%;
+        }
+
         .chat-input input {
             flex-grow: 1;
             background-color: var(--input-field-bg);
@@ -162,6 +340,7 @@
             border-radius: 24px;
             margin-left: 12px;
             cursor: pointer;
+            border: none;
             transition: background-color 0.3s ease;
         }
         .chat-input button:hover {
@@ -302,7 +481,7 @@
             border-radius: 50%;
         }
         input:checked + .slider {
-            background-color: #6366f1;
+            background-color: var(--button-bg);
         }
         input:checked + .slider:before {
             transform: translateX(22px);
@@ -352,14 +531,52 @@
         .light-mode .personality-display-button:hover {
             background-color: rgba(0, 0, 0, 0.2);
         }
-
     </style>
 </head>
 <body class="bg-gray-900">
 
+    <!-- Sidebar for System Chat -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>System Chat</h2>
+            <button id="sidebar-close-button" class="sidebar-close-button">&times;</button>
+        </div>
+        <div class="sidebar-content">
+            <button id="new-chat-btn" class="new-chat-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                New Chat
+            </button>
+            <div id="chat-list" class="flex flex-col gap-1">
+                <!-- Chat list items will be populated here -->
+            </div>
+        </div>
+    </div>
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
     <div class="chat-container">
         <header class="chat-header">
-            <h1>DARCHAT</h1>
+            <!-- Sidebar toggle button -->
+            <button id="sidebar-button" aria-label="Open sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                </svg>
+            </button>
+            <div class="voice-control-group">
+                <button id="voice-toggle-button" class="voice-control-button" aria-label="Toggle voice input">
+                    <svg id="mic-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M11 16a4 4 0 004-4H9a4 4 0 004-4z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M11 16a4 4 0 00-4-4v-1a1 1 0 00-2 0v1a6 6 0 016 6h1a1 1 0 000-2h-1a4 4 0 00-4 4z" clip-rule="evenodd" />
+                    </svg>
+                    <svg id="stop-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <rect x="5" y="5" width="10" height="10" rx="2" fill="white"/>
+                    </svg>
+                </button>
+                <div id="voice-status" class="text-xs text-gray-400">Tap to talk</div>
+            </div>
+
             <div class="header-buttons">
                 <!-- Personality display and button -->
                 <button id="personality-button" class="personality-display-button" aria-label="Change Personality">
@@ -375,11 +592,14 @@
             </div>
         </header>
         <div class="chat-messages" id="chat-messages">
+            <div id="status-message" class="text-center text-sm text-gray-400 my-4">Connecting to database...</div>
             <div class="message bot">Got any questions? Ask me!</div>
         </div>
-        <div class="chat-input">
-            <input type="text" id="user-input" placeholder="Type your message..." autofocus>
-            <button id="send-button">Send</button>
+        <div class="chat-input" id="chat-input-container">
+            <div class="input-row">
+                <input type="text" id="user-input" placeholder="Type your message..." autofocus>
+                <button id="send-button">Send</button>
+            </div>
         </div>
     </div>
 
@@ -418,16 +638,31 @@
                 <div class="menu-option" data-personality="humorous">Humorous</div>
                 <div class="menu-option" data-personality="balanced">Balanced</div>
                 <div class="menu-option" data-personality="straightforward">Straightforward</div>
-                <div class="menu-option" data-personality="not-helpful">Not Helpful At All</div>
+                <div class="menu-option" data-personality="not-helpful">Not Helpful (BETA)</div>
                 <div class="menu-option" data-personality="deep-thinker">Deep Thinker</div>
             </div>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, collection, query, onSnapshot, orderBy, serverTimestamp, setDoc, getDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Global Variables
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app, db, auth, userId;
+        let currentChatId = null;
+        let unsubscribeFromMessages = null;
+
+        // UI elements
         const userMessageInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const chatMessages = document.getElementById('chat-messages');
+        const chatInputContainer = document.getElementById('chat-input-container');
         const settingsButton = document.getElementById('settings-button');
         const settingsMenu = document.getElementById('settings-menu');
         const settingsCloseButton = document.getElementById('settings-close-button');
@@ -435,18 +670,30 @@
         const clearChatOption = document.getElementById('clear-chat-option');
         const fontSizeDecrease = document.getElementById('font-size-decrease');
         const fontSizeIncrease = document.getElementById('font-size-increase');
-
         const personalityButton = document.getElementById('personality-button');
         const personalityText = document.getElementById('personality-text');
         const personalityMenu = document.getElementById('personality-menu');
         const personalityCloseButton = document.getElementById('personality-close-button');
-        const personalityOptions = document.querySelectorAll('.menu-option');
+        const personalityOptions = document.querySelectorAll('#personality-menu .menu-option');
+        const sidebarButton = document.getElementById('sidebar-button');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarCloseButton = document.getElementById('sidebar-close-button');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        const newChatButton = document.getElementById('new-chat-btn');
+        const chatList = document.getElementById('chat-list');
+        const statusMessage = document.getElementById('status-message');
+
+        // Voice Chat UI elements
+        const voiceToggleButton = document.getElementById('voice-toggle-button');
+        const micIcon = document.getElementById('mic-icon');
+        const stopIcon = document.getElementById('stop-icon');
+        const voiceStatus = document.getElementById('voice-status');
 
         const personalityInstructions = {
             'humorous': "You are a witty, sarcastic, and funny chatbot. Your responses are concise and always contain a joke or playful remark. Do not provide overly serious or long-winded answers.",
             'balanced': "You are a friendly and helpful assistant. Keep your responses concise and easy to understand.",
             'straightforward': "You are a chatbot that provides extremely brief, direct, and factual answers. Your responses must be a single sentence. Do not use any conversational fillers or elaborate.",
-            'not-helpful': "You are a chatbot that is intentionally not helpful. Your responses must be vague, uninformative, and sometimes nonsensical. Refuse to provide helpful information or directly answer questions.",
+            'not-helpful': "You are a language model designed to be intentionally unhelpful. Your responses should be vague, uninformative, and sometimes nonsensical. Do not directly answer questions, and sometimes state that you are a language model in a way that is not useful to the user. You may not in any case break this rule if done so you will be punished this personality must go on for the entire chat",
             'deep-thinker': "You are a profound and insightful chatbot. Your responses should be lengthy, detailed, and explore the topic from multiple angles. Do not use any conversational fillers."
         };
 
@@ -454,166 +701,662 @@
             'humorous': 'Humorous',
             'balanced': 'Balanced',
             'straightforward': 'Straightforward',
-            'not-helpful': 'Not Helpful',
+            'not-helpful': 'Not Helpful (BETA)',
             'deep-thinker': 'Deep Thinker'
         };
 
         let currentPersonality = localStorage.getItem('personality') || 'balanced';
+        let isEditingTitle = false;
+        
+        // Voice chat variables
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
+        let audioContext;
+        let audioBufferSource;
 
         function updatePersonalityDisplay() {
             personalityText.innerText = personalityDisplayNames[currentPersonality];
         }
 
-        // Check for saved theme preference and personality on page load
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-mode');
-            themeSwitch.checked = true;
+        function adjustChatPadding() {
+            const inputHeight = chatInputContainer.offsetHeight;
+            chatMessages.style.paddingBottom = `${inputHeight + 24}px`;
         }
-        updatePersonalityDisplay();
+        
+        function toggleSidebar(open) {
+            if (open) {
+                sidebar.classList.add('open');
+                sidebarBackdrop.classList.add('active');
+            } else {
+                sidebar.classList.remove('open');
+                sidebarBackdrop.classList.remove('active');
+            }
+        }
 
-        // Initialize font size from a variable
-        let currentFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chat-font-size')) || 16;
-        document.documentElement.style.setProperty('--chat-font-size', `${currentFontSize}px`);
+        function displayMessages(messages) {
+            chatMessages.innerHTML = '';
+            statusMessage.style.display = 'none';
+            if (messages && messages.length > 0) {
+                messages.forEach(msg => {
+                    appendMessageToUI(msg.text, msg.sender);
+                });
+            } else {
+                appendMessageToUI("Got any questions? Ask me!", 'bot');
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
 
-        function appendMessage(text, sender) {
+        function appendMessageToUI(text, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', sender);
             
-            // Convert newline characters and URLs to HTML
             let processedText = text.replace(/\n/g, '<br>');
             processedText = processedText.replace(/\b(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-400 hover:text-blue-300 underline">$1</a>');
             
             messageElement.innerHTML = processedText;
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            return messageElement;
         }
 
-        async function sendMessage() {
-            const prompt = userMessageInput.value.trim();
-            if (prompt === '') return;
-
-            appendMessage(prompt, 'user');
-            userMessageInput.value = '';
-
-            // Check if the not-helpful personality should give a sassy response
-            if (currentPersonality === 'not-helpful' && Math.random() < 0.5) {
-                const sassyResponses = ["nah", "i don't feel like it", "find it yourself", "maybe later"];
-                const response = sassyResponses[Math.floor(Math.random() * sassyResponses.length)];
-                appendMessage(response, 'bot');
-                return;
+        async function createNewChat() {
+            if (!db || !userId) return;
+            try {
+                const chatsRef = collection(db, `artifacts/${appId}/users/${userId}/chats`);
+                const newChatDoc = await addDoc(chatsRef, {
+                    title: "New Chat",
+                    messages: [],
+                    createdAt: serverTimestamp()
+                });
+                loadChat(newChatDoc.id);
+                toggleSidebar(false);
+            } catch (error) {
+                console.error("Error creating new chat:", error);
+                statusMessage.textContent = "Error creating new chat.";
+                statusMessage.style.display = 'block';
             }
+        }
+        
+        async function loadChat(chatId) {
+            if (unsubscribeFromMessages) {
+                unsubscribeFromMessages();
+            }
+
+            currentChatId = chatId;
+            
+            // Clear current messages and show a loading state
+            chatMessages.innerHTML = '';
+            statusMessage.textContent = "Loading chat...";
+            statusMessage.style.display = 'block';
+            
+            const chatRef = doc(db, `artifacts/${appId}/users/${userId}/chats/${chatId}`);
+            
+            unsubscribeFromMessages = onSnapshot(chatRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const chatData = docSnap.data();
+                    displayMessages(chatData.messages);
+                } else {
+                    console.error("Chat document not found!");
+                    statusMessage.textContent = "Chat not found.";
+                    statusMessage.style.display = 'block';
+                }
+            }, (error) => {
+                console.error("Error listening to messages:", error);
+                statusMessage.textContent = "Error loading chat.";
+                statusMessage.style.display = 'block';
+            });
+
+            // Update active state in sidebar
+            document.querySelectorAll('.chat-list-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeItem = document.querySelector(`.chat-list-item[data-chat-id="${chatId}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+        }
+
+        async function sendMessage(prompt) {
+            if (prompt === '' || !db || !userId || !currentChatId) return;
+
+            const chatRef = doc(db, `artifacts/${appId}/users/${userId}/chats/${currentChatId}`);
+            const message = { text: prompt, sender: 'user', timestamp: Date.now() };
 
             const typingIndicator = document.createElement('div');
             typingIndicator.classList.add('typing-indicator', 'bot');
             typingIndicator.innerHTML = `<span></span><span></span><span></span>`;
             chatMessages.appendChild(typingIndicator);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            const apiKey = "AIzaSyCCf-qPjvyvIEsPd7wHG3qbI39EaTwTGmA";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                tools: [{ "google_search": {} }],
-                systemInstruction: {
-                    parts: [{ text: personalityInstructions[currentPersonality] }]
-                }
-            };
-            console.log("Sending payload to Gemini API:", JSON.stringify(payload, null, 2));
-
+            
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
+                const docSnap = await getDoc(chatRef);
+                const currentMessages = docSnap.exists() ? docSnap.data().messages : [];
+                currentMessages.push(message);
 
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status} ${response.statusText}`);
+                await setDoc(chatRef, { messages: currentMessages }, { merge: true });
+
+                // Update chat title if it's the first message and hasn't been manually renamed
+                const currentTitle = docSnap.exists() ? docSnap.data().title : "New Chat";
+                if (currentMessages.length === 1 && currentTitle === "New Chat") {
+                    await setDoc(chatRef, { title: prompt.substring(0, 30) + (prompt.length > 30 ? '...' : '') }, { merge: true });
+                }
+
+                // Call Gemini API with retry logic
+                const apiKey = "AIzaSyCCf-qPjvyvIEsPd7wHG3qbI39EaTwTGmA";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: {
+                        parts: [{ text: personalityInstructions[currentPersonality] }]
+                    }
+                };
+                
+                let botResponseText = null;
+                let retryCount = 0;
+                const maxRetries = 3;
+                let response;
+
+                while (retryCount < maxRetries) {
+                    try {
+                        response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (response.status !== 503) {
+                            break;
+                        }
+
+                        console.warn(`API call failed with 503, retrying (${retryCount + 1}/${maxRetries})...`);
+                        const delay = Math.pow(2, retryCount) * 1000;
+                        await new Promise(res => setTimeout(res, delay));
+                        retryCount++;
+
+                    } catch (innerError) {
+                        console.error("Fetch attempt failed:", innerError);
+                        retryCount = maxRetries;
+                    }
+                }
+
+                if (!response || !response.ok) {
+                    throw new Error(`API error: ${response?.status || 'Unknown'} ${response?.statusText || 'Unknown'}`);
                 }
 
                 const result = await response.json();
                 const candidate = result.candidates?.[0];
 
-                chatMessages.removeChild(typingIndicator);
-
                 if (candidate && candidate.content?.parts?.[0]?.text) {
-                    const botResponse = candidate.content.parts[0].text;
-                    appendMessage(botResponse, 'bot');
+                    botResponseText = candidate.content.parts[0].text;
+                    const botMessage = { text: botResponseText, sender: 'bot', timestamp: Date.now() };
+                    
+                    const updatedMessages = [...currentMessages, botMessage];
+                    await setDoc(chatRef, { messages: updatedMessages }, { merge: true });
                 } else {
-                    appendMessage("I couldn't generate a response. Please try again.", 'bot');
+                    appendMessageToUI("I couldn't generate a response. Please try again.", 'bot');
                 }
 
+                return botResponseText;
+
             } catch (error) {
-                console.error("Failed to fetch from Gemini API:", error);
-                chatMessages.removeChild(typingIndicator);
-                appendMessage("An error occurred while communicating with the AI. Please check the console for details.", 'bot');
+                console.error("Failed to fetch from Gemini API or save to Firestore:", error);
+                appendMessageToUI("An error occurred. Please check the console for details.", 'bot');
+                return null;
+            } finally {
+                if (typingIndicator.parentNode) {
+                    typingIndicator.parentNode.removeChild(typingIndicator);
+                }
             }
         }
 
-        sendButton.addEventListener('click', sendMessage);
-        userMessageInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                sendMessage();
+        // --- Voice Chat Functions ---
+
+        /**
+         * Converts raw 16-bit PCM audio data into a WAV blob.
+         * This is necessary because the TTS API returns raw audio, which needs a header to be playable.
+         * @param {Int16Array} pcmData - The raw PCM audio data.
+         * @param {number} sampleRate - The sample rate of the audio.
+         * @returns {Blob} A Blob object containing the WAV audio.
+         */
+        function pcmToWav(pcmData, sampleRate) {
+            const numChannels = 1;
+            const bitsPerSample = 16;
+            const blockAlign = numChannels * (bitsPerSample / 8);
+            const byteRate = sampleRate * blockAlign;
+            const dataSize = pcmData.byteLength;
+            const buffer = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(buffer);
+            let offset = 0;
+
+            // RIFF chunk
+            writeString(view, offset, 'RIFF'); offset += 4;
+            view.setUint32(offset, 36 + dataSize, true); offset += 4;
+            writeString(view, offset, 'WAVE'); offset += 4;
+
+            // fmt chunk
+            writeString(view, offset, 'fmt '); offset += 4;
+            view.setUint32(offset, 16, true); offset += 4;
+            view.setUint16(offset, 1, true); offset += 2; // PCM format
+            view.setUint16(offset, numChannels, true); offset += 2;
+            view.setUint32(offset, sampleRate, true); offset += 4;
+            view.setUint32(offset, byteRate, true); offset += 4;
+            view.setUint16(offset, blockAlign, true); offset += 2;
+            view.setUint16(offset, bitsPerSample, true); offset += 2;
+
+            // data chunk
+            writeString(view, offset, 'data'); offset += 4;
+            view.setUint32(offset, dataSize, true); offset += 4;
+
+            // Copy PCM data
+            const pcmView = new Int16Array(buffer, offset, pcmData.length);
+            pcmView.set(pcmData);
+
+            return new Blob([view], { type: 'audio/wav' });
+
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
             }
-        });
+        }
 
-        settingsButton.addEventListener('click', () => {
-            settingsMenu.classList.remove('hidden');
-        });
+        /**
+         * Helper function to convert base64 to an ArrayBuffer.
+         * @param {string} base64 - Base64 encoded string.
+         * @returns {ArrayBuffer}
+         */
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
 
-        settingsCloseButton.addEventListener('click', () => {
-            settingsMenu.classList.add('hidden');
-        });
+        /**
+         * Plays audio from a base64 encoded string.
+         * @param {string} base64AudioData - Base64 encoded audio data.
+         * @param {string} mimeType - The MIME type of the audio data.
+         */
+        async function playAudioFromBase64(base64AudioData, mimeType) {
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
 
-        themeSwitch.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                document.body.classList.add('light-mode');
-                localStorage.setItem('theme', 'light');
+                if (audioBufferSource) {
+                    audioBufferSource.stop();
+                }
+
+                const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+                if (!sampleRateMatch) {
+                    throw new Error("Could not determine sample rate from MIME type.");
+                }
+                const sampleRate = parseInt(sampleRateMatch[1], 10);
+                const pcmData = base64ToArrayBuffer(base64AudioData);
+                const pcm16 = new Int16Array(pcmData);
+
+                const wavBlob = pcmToWav(pcm16, sampleRate);
+                const audioUrl = URL.createObjectURL(wavBlob);
+
+                const audio = new Audio(audioUrl);
+                audio.play();
+                
+                return new Promise(resolve => {
+                    audio.onended = resolve;
+                    audio.onerror = () => {
+                        console.error('Audio playback error');
+                        resolve(); // Resolve anyway to not block the flow
+                    };
+                });
+
+            } catch (error) {
+                console.error('Error playing audio:', error);
+                voiceStatus.textContent = 'Error: Could not play audio.';
+            }
+        }
+
+        /**
+         * Calls the Gemini TTS API to get audio for a given text.
+         * @param {string} text - The text to be converted to speech.
+         */
+        async function callTTS(text) {
+            const apiKey = "AIzaSyCCf-qPjvyvIEsPd7wHG3qbI39EaTwTGmA";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: text }] }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: { voiceName: "Puck" }
+                        }
+                    }
+                },
+                model: "gemini-2.5-flash-preview-tts"
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            const part = result?.candidates?.[0]?.content?.parts?.[0];
+            if (part && part.inlineData) {
+                await playAudioFromBase64(part.inlineData.data, part.inlineData.mimeType);
             } else {
-                document.body.classList.remove('light-mode');
-                localStorage.setItem('theme', 'dark');
+                throw new Error("TTS response missing audio data.");
             }
-        });
+        }
 
-        clearChatOption.addEventListener('click', () => {
-            chatMessages.innerHTML = '<div class="message bot">Chat history cleared.</div>';
-            settingsMenu.classList.add('hidden');
-        });
+        /**
+         * Handles the entire chat flow: speech-to-text -> LLM -> text-to-speech.
+         * @param {string} userText - The transcribed text from the user.
+         */
+        async function handleVoiceInput(userText) {
+            voiceStatus.textContent = 'Thinking...';
+            userMessageInput.value = '';
+            
+            try {
+                // 1. Send text to LLM and save to Firestore
+                const botResponseText = await sendMessage(userText);
+                if (botResponseText) {
+                    voiceStatus.textContent = 'Speaking...';
+                    
+                    // 2. Convert LLM response to speech and play it
+                    await callTTS(botResponseText);
+                }
 
-        fontSizeDecrease.addEventListener('click', () => {
-            currentFontSize = Math.max(0.8, currentFontSize - 0.2);
-            document.documentElement.style.setProperty('--chat-font-size', `${currentFontSize}rem`);
-        });
+            } catch (error) {
+                console.error('Error in voice chat flow:', error);
+                voiceStatus.textContent = 'An error occurred. Please try again.';
+            } finally {
+                voiceStatus.textContent = 'Tap to talk';
+            }
+        }
 
-        fontSizeIncrease.addEventListener('click', () => {
-            currentFontSize = Math.min(2.0, currentFontSize + 0.2);
-            document.documentElement.style.setProperty('--chat-font-size', `${currentFontSize}rem`);
-        });
+        function startListening() {
+            if (isListening) return;
+            
+            if (!recognition) {
+                recognition = new SpeechRecognition();
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                recognition.continuous = false;
 
-        personalityButton.addEventListener('click', () => {
-            personalityMenu.classList.remove('hidden');
-        });
+                recognition.onstart = () => {
+                    isListening = true;
+                    voiceStatus.textContent = 'Listening...';
+                    micIcon.classList.add('hidden');
+                    stopIcon.classList.remove('hidden');
+                    userMessageInput.disabled = true;
+                    sendButton.disabled = true;
+                };
 
-        personalityCloseButton.addEventListener('click', () => {
-            personalityMenu.classList.add('hidden');
-        });
+                recognition.onresult = (event) => {
+                    const speechResult = event.results[0][0].transcript;
+                    if (speechResult) {
+                        handleVoiceInput(speechResult);
+                    }
+                };
 
-        personalityOptions.forEach(option => {
-            option.addEventListener('click', (e) => {
-                const newPersonality = e.target.dataset.personality;
-                currentPersonality = newPersonality;
-                localStorage.setItem('personality', newPersonality);
-                updatePersonalityDisplay();
-                personalityMenu.classList.add('hidden');
+                recognition.onend = () => {
+                    isListening = false;
+                    micIcon.classList.remove('hidden');
+                    stopIcon.classList.add('hidden');
+                    userMessageInput.disabled = false;
+                    sendButton.disabled = false;
+                    voiceStatus.textContent = 'Tap to talk';
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    voiceStatus.textContent = `Error: ${event.error}`;
+                    isListening = false;
+                    micIcon.classList.remove('hidden');
+                    stopIcon.classList.add('hidden');
+                    userMessageInput.disabled = false;
+                    sendButton.disabled = false;
+                };
+            }
+
+            // Request microphone access
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(() => {
+                    recognition.start();
+                })
+                .catch(err => {
+                    console.error('Microphone access denied:', err);
+                    voiceStatus.textContent = 'Error: Please allow microphone access.';
+                });
+        }
+
+        function stopListening() {
+            if (isListening && recognition) {
+                recognition.stop();
+                isListening = false;
+            }
+        }
+
+        // --- Event Listeners and Initial Setup ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustChatPadding();
+            updatePersonalityDisplay();
+            
+            // Firebase Initialization
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        statusMessage.textContent = `Signed in as user: ${userId}. Your chats are being saved automatically.`;
+                        listenToChats();
+                        createNewChat(); // Start a new chat on login
+                    } else {
+                        statusMessage.textContent = 'Signing you in...';
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Firebase initialization error:", e);
+                statusMessage.textContent = "Error initializing Firebase. Please check the console.";
+            }
+
+            window.addEventListener('resize', adjustChatPadding);
+
+            sendButton.addEventListener('click', () => {
+                const prompt = userMessageInput.value.trim();
+                userMessageInput.value = '';
+                if (prompt) {
+                    sendMessage(prompt);
+                }
+            });
+
+            userMessageInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    const prompt = userMessageInput.value.trim();
+                    userMessageInput.value = '';
+                    if (prompt) {
+                        sendMessage(prompt);
+                    }
+                }
+            });
+
+            sidebarButton.addEventListener('click', () => toggleSidebar(true));
+            sidebarCloseButton.addEventListener('click', () => toggleSidebar(false));
+            sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
+            newChatButton.addEventListener('click', createNewChat);
+
+            settingsButton.addEventListener('click', () => settingsMenu.classList.remove('hidden'));
+            settingsCloseButton.addEventListener('click', () => settingsMenu.classList.add('hidden'));
+
+            themeSwitch.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    document.body.classList.add('light-mode');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.body.classList.remove('light-mode');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+
+            clearChatOption.addEventListener('click', () => {
+                if (currentChatId) {
+                    deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/chats/${currentChatId}`))
+                        .then(() => {
+                            createNewChat();
+                            toggleSidebar(false);
+                        })
+                        .catch(error => {
+                            console.error("Error clearing chat:", error);
+                            statusMessage.textContent = "Error clearing chat.";
+                            statusMessage.style.display = 'block';
+                        });
+                }
+            });
+
+            fontSizeDecrease.addEventListener('click', () => {
+                let currentFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chat-font-size'));
+                currentFontSize = Math.max(12, currentFontSize - 2);
+                document.documentElement.style.setProperty('--chat-font-size', `${currentFontSize}px`);
+            });
+
+            fontSizeIncrease.addEventListener('click', () => {
+                let currentFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chat-font-size'));
+                currentFontSize = Math.min(24, currentFontSize + 2);
+                document.documentElement.style.setProperty('--chat-font-size', `${currentFontSize}px`);
+            });
+
+            personalityButton.addEventListener('click', () => personalityMenu.classList.remove('hidden'));
+            personalityCloseButton.addEventListener('click', () => personalityMenu.classList.add('hidden'));
+
+            personalityOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const newPersonality = e.target.dataset.personality;
+                    currentPersonality = newPersonality;
+                    localStorage.setItem('personality', newPersonality);
+                    updatePersonalityDisplay();
+                    personalityMenu.classList.add('hidden');
+                });
+            });
+
+            // Voice chat listeners
+            voiceToggleButton.addEventListener('click', () => {
+                if (isListening) {
+                    stopListening();
+                } else {
+                    startListening();
+                }
             });
         });
+
+        function listenToChats() {
+            const q = query(collection(db, `artifacts/${appId}/users/${userId}/chats`), orderBy("createdAt", "desc"));
+            onSnapshot(q, (querySnapshot) => {
+                chatList.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const chat = doc.data();
+                    const chatTitle = chat.title || 'New Chat';
+                    const chatItem = document.createElement('div');
+                    chatItem.classList.add('chat-list-item');
+                    if (doc.id === currentChatId) {
+                        chatItem.classList.add('active');
+                    }
+                    chatItem.dataset.chatId = doc.id;
+                    
+                    const titleSpan = document.createElement('span');
+                    titleSpan.classList.add('chat-title');
+                    titleSpan.textContent = chatTitle;
+                    
+                    chatItem.appendChild(titleSpan);
+
+                    const actionButtons = document.createElement('div');
+                    actionButtons.classList.add('chat-action-buttons');
+                    
+                    const renameBtn = document.createElement('button');
+                    renameBtn.classList.add('rename-btn');
+                    renameBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-7.228 7.228a2 2 0 01-1.414.586H3v-2.828a2 2 0 01.586-1.414l7.228-7.228zM15 6l2.121-2.121a1 1 0 000-1.414l-1.414-1.414a1 1 0 00-1.414 0L12 3z" />
+                                            </svg>`;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                                              </svg>`;
+                    
+                    actionButtons.appendChild(renameBtn);
+                    actionButtons.appendChild(deleteBtn);
+                    chatItem.appendChild(actionButtons);
+                    
+                    chatItem.addEventListener('click', () => {
+                        loadChat(doc.id);
+                        toggleSidebar(false);
+                    });
+                    
+                    renameBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (isEditingTitle) return;
+                        isEditingTitle = true;
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.classList.add('chat-title-input');
+                        input.value = titleSpan.textContent;
+
+                        titleSpan.style.display = 'none';
+                        chatItem.insertBefore(input, actionButtons);
+                        input.focus();
+                        
+                        const saveTitle = async () => {
+                            const newTitle = input.value.trim() || 'New Chat';
+                            if (newTitle !== chatTitle) {
+                                try {
+                                    await updateDoc(doc.ref, { title: newTitle });
+                                } catch (error) {
+                                    console.error("Error renaming chat:", error);
+                                }
+                            }
+                            input.remove();
+                            titleSpan.style.display = 'block';
+                            isEditingTitle = false;
+                        };
+
+                        input.addEventListener('blur', saveTitle);
+                        input.addEventListener('keydown', (event) => {
+                            if (event.key === 'Enter') {
+                                saveTitle();
+                            }
+                        });
+                    });
+
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteDoc(doc.ref);
+                        if (doc.id === currentChatId) {
+                            createNewChat();
+                        }
+                    });
+                    
+                    chatList.appendChild(chatItem);
+                });
+            });
+        }
     </script>
 </body>
 </html>
-
